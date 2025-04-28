@@ -1,103 +1,253 @@
-import Image from "next/image";
+import Link from "next/link"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Search, Gift, Heart } from "lucide-react"
+import { Product } from "@/types/product"
+import ProductCard from "@/components/ProductCard"
+
+// Імітація даних продуктів
+const FEATURED_PRODUCTS: Product[] = [
+  {
+    id: "1",
+    name: "Корм для собак преміум Royal Canin",
+    price: 599,
+    category: "food",
+    description: "Високоякісний сухий корм для дорослих собак середніх порід.",
+    rating: 4.5,
+    image: "/placeholder.svg?height=250&width=250",
+    reviews: 128,
+    inStock: true
+  },
+  {
+    id: "2",
+    name: "Іграшка для котів 'Миша'",
+    price: 199,
+    category: "toys",
+    description: "М'яка іграшка у формі миші з натуральних матеріалів.",
+    rating: 4.2,
+    image: "/placeholder.svg?height=250&width=250",
+    reviews: 85,
+    inStock: true
+  },
+  {
+    id: "3",
+    name: "Шампунь для собак",
+    price: 249,
+    category: "care",
+    description: "Делікатний шампунь для собак усіх порід.",
+    rating: 4.3,
+    image: "/placeholder.svg?height=250&width=250",
+    reviews: 64,
+    inStock: true
+  },
+  {
+    id: "4",
+    name: "Лежак для котів",
+    price: 899,
+    category: "accessories",
+    description: "М'який та комфортний лежак для котів.",
+    rating: 4.7,
+    image: "/placeholder.svg?height=250&width=250",
+    reviews: 50,
+    inStock: true
+  },
+  {
+    id: "5",
+    name: "Корм для котів сухий",
+    price: 499,
+    category: "food",
+    description: "Збалансований сухий корм для дорослих котів.",
+    rating: 4.4,
+    image: "/placeholder.svg?height=250&width=250",
+    reviews: 36,
+    inStock: true
+  },
+  {
+    id: "6",
+    name: "М'ячик для собак",
+    price: 149,
+    category: "toys",
+    description: "Міцний гумовий м'ячик для активних ігор.",
+    rating: 4.6,
+    image: "/placeholder.svg?height=250&width=250",
+    reviews: 24,
+    inStock: true
+  }
+]
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="page-transition">
+      {/* Головні категорії */}
+      <section className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Link href="/catalog?category=food" className="block">
+            <Card className="category-card overflow-hidden border-[#e8e5e0]">
+              <CardContent className="p-6 flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-[#a8d5a2] flex items-center justify-center mb-4">
+                  <Search className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Пошук корму</h3>
+                <p className="text-gray-600 mb-4">Знайдіть ідеальний корм для вашого улюбленця</p>
+                <Button className="bg-[#a8d5a2] hover:bg-[#97c491] text-white">Перейти до каталогу</Button>
+              </CardContent>
+            </Card>
+          </Link>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          <Link href="/catalog?category=toys" className="block">
+            <Card className="category-card overflow-hidden border-[#e8e5e0]">
+              <CardContent className="p-6 flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-[#a8d5a2] flex items-center justify-center mb-4">
+                  <Gift className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Іграшки для веселощів</h3>
+                <p className="text-gray-600 mb-4">Великий вибір іграшок для активного дозвілля</p>
+                <Button className="bg-[#a8d5a2] hover:bg-[#97c491] text-white">Дивитись іграшки</Button>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/catalog?category=care" className="block">
+            <Card className="category-card overflow-hidden border-[#e8e5e0]">
+              <CardContent className="p-6 flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-[#a8d5a2] flex items-center justify-center mb-4">
+                  <Heart className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Догляд за улюбленцем</h3>
+                <p className="text-gray-600 mb-4">Все необхідне для здоров'я та гігієни</p>
+                <Button className="bg-[#a8d5a2] hover:bg-[#97c491] text-white">Товари для догляду</Button>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </section>
+
+      {/* Товари для вашого улюбленця */}
+      <section className="container mx-auto px-4 py-8">
+        <h2 className="text-2xl font-semibold mb-6">Товари для вашого улюбленця</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Link href="/catalog?pet=dog" className="block">
+            <Card className="category-card overflow-hidden border-[#e8e5e0]">
+              <CardContent className="p-0">
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold mb-4">Для собак</h3>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="aspect-square relative rounded overflow-hidden">
+                      <Image
+                        src="/placeholder.svg?height=100&width=100"
+                        alt="Корм для собак"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="aspect-square relative rounded overflow-hidden">
+                      <Image
+                        src="/placeholder.svg?height=100&width=100"
+                        alt="Іграшки для собак"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="aspect-square relative rounded overflow-hidden">
+                      <Image
+                        src="/placeholder.svg?height=100&width=100"
+                        alt="Аксесуари для собак"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/catalog?pet=cat" className="block">
+            <Card className="category-card overflow-hidden border-[#e8e5e0]">
+              <CardContent className="p-0">
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold mb-4">Для котів</h3>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="aspect-square relative rounded overflow-hidden">
+                      <Image
+                        src="/placeholder.svg?height=100&width=100"
+                        alt="Корм для котів"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="aspect-square relative rounded overflow-hidden">
+                      <Image
+                        src="/placeholder.svg?height=100&width=100"
+                        alt="Іграшки для котів"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="aspect-square relative rounded overflow-hidden">
+                      <Image
+                        src="/placeholder.svg?height=100&width=100"
+                        alt="Аксесуари для котів"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/catalog?pet=other" className="block">
+            <Card className="category-card overflow-hidden border-[#e8e5e0]">
+              <CardContent className="p-0">
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold mb-4">Для інших тварин</h3>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="aspect-square relative rounded overflow-hidden">
+                      <Image
+                        src="/placeholder.svg?height=100&width=100"
+                        alt="Товари для гризунів"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="aspect-square relative rounded overflow-hidden">
+                      <Image
+                        src="/placeholder.svg?height=100&width=100"
+                        alt="Товари для птахів"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="aspect-square relative rounded overflow-hidden">
+                      <Image
+                        src="/placeholder.svg?height=100&width=100"
+                        alt="Товари для риб"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+      </section>
+
+      {/* Ми підібрали для вас */}
+      <section className="container mx-auto px-4 py-8">
+        <h2 className="text-2xl font-semibold mb-6">Ми підібрали для вас</h2>
+        <div className="flex overflow-x-auto pb-4 gap-6 hide-scrollbar">
+          {FEATURED_PRODUCTS.map((product) => (
+            <div key={product.id} className="min-w-[250px]">
+              <ProductCard product={product} />
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
-  );
+  )
 }
