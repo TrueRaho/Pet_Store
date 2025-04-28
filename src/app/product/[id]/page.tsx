@@ -1,3 +1,4 @@
+/// <reference types="next" />
 import { Metadata } from 'next'
 import { Product } from '@/types/product'
 import ProductClient from './product-client'
@@ -115,17 +116,27 @@ const getRecommendedProducts = (ids: string[]): Product[] => {
   return ids.map((id) => getProductById(id))
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const product = getProductById(params.id)
+type SearchParams = { [key: string]: string | string[] | undefined }
+
+type Props = {
+  params: Promise<{ id: string }>
+  searchParams?: Promise<SearchParams>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const resolvedParams = await params
+  const product = getProductById(resolvedParams.id)
+  
   return {
     title: product.name,
     description: product.description,
   }
 }
 
-export default function ProductPage({ params }: { params: { id: string } }) {
-  const product = getProductById(params.id)
-  const recommendedProducts = getRecommendedProducts([product.id])
+export default async function ProductPage({ params }: Props) {
+  const resolvedParams = await params
+  const product = getProductById(resolvedParams.id)
+  const recommendedProducts = getRecommendedProducts(['1', '2', '3', '4'])
 
   return <ProductClient product={product} recommendedProducts={recommendedProducts} />
 }
