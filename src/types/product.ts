@@ -7,7 +7,6 @@ export interface Product {
   image: string
   rating: number
   reviews: number
-  inStock: boolean
 }
 
 export interface ProductListResponse {

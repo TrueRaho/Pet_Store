@@ -16,8 +16,7 @@ const FEATURED_PRODUCTS: Product[] = [
     description: "Високоякісний сухий корм для дорослих собак середніх порід.",
     rating: 4.5,
     image: "/placeholder.svg?height=250&width=250",
-    reviews: 128,
-    inStock: true
+    reviews: 128
   },
   {
     id: "2",
@@ -27,8 +26,7 @@ const FEATURED_PRODUCTS: Product[] = [
     description: "М'яка іграшка у формі миші з натуральних матеріалів.",
     rating: 4.2,
     image: "/placeholder.svg?height=250&width=250",
-    reviews: 85,
-    inStock: true
+    reviews: 85
   },
   {
     id: "3",
@@ -38,8 +36,7 @@ const FEATURED_PRODUCTS: Product[] = [
     description: "Делікатний шампунь для собак усіх порід.",
     rating: 4.3,
     image: "/placeholder.svg?height=250&width=250",
-    reviews: 64,
-    inStock: true
+    reviews: 64
   },
   {
     id: "4",
@@ -49,8 +46,7 @@ const FEATURED_PRODUCTS: Product[] = [
     description: "М'який та комфортний лежак для котів.",
     rating: 4.7,
     image: "/placeholder.svg?height=250&width=250",
-    reviews: 50,
-    inStock: true
+    reviews: 50
   },
   {
     id: "5",
@@ -60,8 +56,7 @@ const FEATURED_PRODUCTS: Product[] = [
     description: "Збалансований сухий корм для дорослих котів.",
     rating: 4.4,
     image: "/placeholder.svg?height=250&width=250",
-    reviews: 36,
-    inStock: true
+    reviews: 36
   },
   {
     id: "6",
@@ -71,8 +66,7 @@ const FEATURED_PRODUCTS: Product[] = [
     description: "Міцний гумовий м'ячик для активних ігор.",
     rating: 4.6,
     image: "/placeholder.svg?height=250&width=250",
-    reviews: 24,
-    inStock: true
+    reviews: 24
   }
 ]
 
