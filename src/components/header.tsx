@@ -1,16 +1,19 @@
 "use client"
 
 import { useState, FormEvent } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
 import { Search, User, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useCart } from "@/context/CartContext"
 
 export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const router = useRouter()
+  const pathname = usePathname() // Хук для отслеживания изменения пути
+  const { itemsCount } = useCart() // Используем контекст корзины
 
   const handleSearch = (event: FormEvent) => {
     event.preventDefault()
@@ -79,9 +82,11 @@ export default function Header() {
           <Link href="/cart">
             <Button variant="ghost" size="icon" className="relative">
               <ShoppingCart className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 bg-[#a8d5a2] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                3
-              </span>
+              {itemsCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-[#a8d5a2] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {itemsCount > 99 ? '99+' : itemsCount}
+                </span>
+              )}
               <span className="sr-only">Кошик</span>
             </Button>
           </Link>

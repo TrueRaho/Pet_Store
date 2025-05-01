@@ -4,12 +4,13 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
+import { CartProvider } from "@/context/CartContext"
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] })
 
 export const metadata: Metadata = {
-  title: "Pet Online Shop",
-  description: "Онлайн магазин товарів для домашніх тварин",
+  title: "ЛапкиТапки - Інтернет-магазин товарів для домашніх тварин",
+  description: "Найкращі товари для ваших домашніх улюбленців за доступними цінами",
 }
 
 export default function RootLayout({
@@ -20,16 +21,18 @@ export default function RootLayout({
   return (
     <html lang="uk" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <Header />
-          <main className="min-h-screen pt-20 pb-10">{children}</main>
-          <Footer />
-        </ThemeProvider>
+        <CartProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
+            <Header />
+            <main className="min-h-screen pt-20 pb-10">{children}</main>
+            <Footer />
+          </ThemeProvider>
+        </CartProvider>
       </body>
     </html>
   )

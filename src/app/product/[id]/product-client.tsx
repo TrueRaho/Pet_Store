@@ -6,6 +6,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Star, Plus, Minus } from "lucide-react"
 import { Product } from "@/types/product"
+import { useRouter } from "next/navigation"
+import { useCart } from "@/context/CartContext"
 
 interface ProductClientProps {
   product: Product
@@ -15,6 +17,8 @@ interface ProductClientProps {
 export default function ProductClient({ product, recommendedProducts }: ProductClientProps) {
   const [selectedImage, setSelectedImage] = useState(product.image)
   const [quantity, setQuantity] = useState(1)
+  const router = useRouter()
+  const { addToCart } = useCart()
 
   const increaseQuantity = () => {
     setQuantity((prev) => prev + 1)
@@ -24,8 +28,14 @@ export default function ProductClient({ product, recommendedProducts }: ProductC
     setQuantity((prev) => (prev > 1 ? prev - 1 : 1))
   }
 
-  const addToCart = () => {
-    alert(`Додано до кошика: ${product.name} (${quantity} шт.)`)
+  const handleAddToCart = () => {
+    // Добавляем товар в корзину через контекст
+    addToCart(product, quantity)
+    
+    // Перенаправляем на страницу корзины или показываем уведомление
+    if (confirm('Товар добавлен в корзину. Перейти в корзину?')) {
+      router.push('/cart')
+    }
   }
 
   return (
@@ -89,7 +99,7 @@ export default function ProductClient({ product, recommendedProducts }: ProductC
             <Button
               className="flex-1 bg-[#a8d5a2] hover:bg-[#97c491] text-white"
               size="lg"
-              onClick={addToCart}
+              onClick={handleAddToCart}
             >
               Додати до кошика
             </Button>
@@ -101,26 +111,28 @@ export default function ProductClient({ product, recommendedProducts }: ProductC
       <div className="mt-16">
         <h2 className="text-2xl font-bold mb-6">Рекомендовані товари</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {recommendedProducts.map((product) => (
-            <div key={product.id} className="border rounded-lg overflow-hidden">
+          {recommendedProducts.map((recProduct) => (
+            <div key={recProduct.id} className="border rounded-lg overflow-hidden">
               <div className="aspect-square relative">
                 <Image
-                  src={product.image}
-                  alt={product.name}
+                  src={recProduct.image}
+                  alt={recProduct.name}
                   fill
                   className="object-cover"
                 />
               </div>
               <div className="p-4">
-                <h3 className="font-semibold mb-2">{product.name}</h3>
+                <h3 className="font-semibold mb-2">{recProduct.name}</h3>
                 <div className="flex justify-between items-center">
-                  <span className="font-bold">{product.price} ₴</span>
-                  <Button
-                    size="sm"
-                    className="bg-[#a8d5a2] hover:bg-[#97c491] text-white"
-                  >
-                    Купити
-                  </Button>
+                  <span className="font-bold">{recProduct.price} ₴</span>
+                  <Link href={`/product/${recProduct.id}`}>
+                    <Button
+                      size="sm"
+                      className="bg-[#a8d5a2] hover:bg-[#97c491] text-white"
+                    >
+                      Купити
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>

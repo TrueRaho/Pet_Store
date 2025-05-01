@@ -1,72 +1,49 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react"
+import { useCart } from "@/context/CartContext"
 
+// Интерфейс для элемента корзины
 interface CartItem {
-  id: number
+  id: string
   name: string
   price: number
   quantity: number
   image: string
 }
 
-// Імітація даних кошика
-const initialCartItems: CartItem[] = [
-  {
-    id: 1,
-    name: "Корм для собак преміум Royal Canin",
-    price: 599,
-    quantity: 1,
-    image: "/placeholder.svg?height=100&width=100",
-  },
-  {
-    id: 3,
-    name: "Шампунь для собак",
-    price: 249,
-    quantity: 2,
-    image: "/placeholder.svg?height=100&width=100",
-  },
-  {
-    id: 6,
-    name: "М'ячик для собак",
-    price: 149,
-    quantity: 1,
-    image: "/placeholder.svg?height=100&width=100",
-  },
-]
-
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItem[]>(initialCartItems)
+  const { cartItems, updateQuantity, removeFromCart } = useCart()
+  const [isClient, setIsClient] = useState(false)
 
-  const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity < 1) return
+  // Устанавливаем флаг клиентского рендеринга
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
-    setCartItems((prev) => prev.map((item) => (item.id === id ? { ...item, quantity: newQuantity } : item)))
-  }
-
-  const removeItem = (id: number) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id))
-  }
-
+  // Расчет суммы товаров
   const calculateSubtotal = () => {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
   }
 
+  // Расчет стоимости доставки
   const calculateDelivery = () => {
     const subtotal = calculateSubtotal()
     return subtotal > 1000 ? 0 : 100
   }
 
+  // Расчет общей суммы
   const calculateTotal = () => {
     return calculateSubtotal() + calculateDelivery()
   }
 
-  if (cartItems.length === 0) {
+  // Отображение пустой корзины
+  if (!isClient || cartItems.length === 0) {
     return (
       <div className="page-transition container mx-auto px-4 py-16 text-center">
         <div className="max-w-md mx-auto">
@@ -131,7 +108,7 @@ export default function CartPage() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeFromCart(item.id)}
                         className="text-gray-500 hover:text-red-500"
                       >
                         <Trash2 className="h-4 w-4" />
