@@ -130,7 +130,9 @@ exports.Prisma.ProductScalarFieldEnum = {
   image: 'image',
   reviews: 'reviews',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  pet: 'pet',
+  brand: 'brand'
 };
 
 exports.Prisma.SortOrder = {

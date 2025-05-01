@@ -904,6 +904,8 @@ export namespace Prisma {
     reviews: number | null
     createdAt: Date | null
     updatedAt: Date | null
+    pet: string | null
+    brand: string | null
   }
 
   export type ProductMaxAggregateOutputType = {
@@ -917,6 +919,8 @@ export namespace Prisma {
     reviews: number | null
     createdAt: Date | null
     updatedAt: Date | null
+    pet: string | null
+    brand: string | null
   }
 
   export type ProductCountAggregateOutputType = {
@@ -930,6 +934,8 @@ export namespace Prisma {
     reviews: number
     createdAt: number
     updatedAt: number
+    pet: number
+    brand: number
     _all: number
   }
 
@@ -957,6 +963,8 @@ export namespace Prisma {
     reviews?: true
     createdAt?: true
     updatedAt?: true
+    pet?: true
+    brand?: true
   }
 
   export type ProductMaxAggregateInputType = {
@@ -970,6 +978,8 @@ export namespace Prisma {
     reviews?: true
     createdAt?: true
     updatedAt?: true
+    pet?: true
+    brand?: true
   }
 
   export type ProductCountAggregateInputType = {
@@ -983,6 +993,8 @@ export namespace Prisma {
     reviews?: true
     createdAt?: true
     updatedAt?: true
+    pet?: true
+    brand?: true
     _all?: true
   }
 
@@ -1083,6 +1095,8 @@ export namespace Prisma {
     reviews: number
     createdAt: Date
     updatedAt: Date
+    pet: string
+    brand: string
     _count: ProductCountAggregateOutputType | null
     _avg: ProductAvgAggregateOutputType | null
     _sum: ProductSumAggregateOutputType | null
@@ -1115,6 +1129,8 @@ export namespace Prisma {
     reviews?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    pet?: boolean
+    brand?: boolean
   }, ExtArgs["result"]["product"]>
 
   export type ProductSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1128,6 +1144,8 @@ export namespace Prisma {
     reviews?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    pet?: boolean
+    brand?: boolean
   }, ExtArgs["result"]["product"]>
 
   export type ProductSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1141,6 +1159,8 @@ export namespace Prisma {
     reviews?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    pet?: boolean
+    brand?: boolean
   }, ExtArgs["result"]["product"]>
 
   export type ProductSelectScalar = {
@@ -1154,9 +1174,11 @@ export namespace Prisma {
     reviews?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    pet?: boolean
+    brand?: boolean
   }
 
-  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "price" | "category" | "description" | "rating" | "image" | "reviews" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "price" | "category" | "description" | "rating" | "image" | "reviews" | "createdAt" | "updatedAt" | "pet" | "brand", ExtArgs["result"]["product"]>
 
   export type $ProductPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Product"
@@ -1172,6 +1194,8 @@ export namespace Prisma {
       reviews: number
       createdAt: Date
       updatedAt: Date
+      pet: string
+      brand: string
     }, ExtArgs["result"]["product"]>
     composites: {}
   }
@@ -1605,6 +1629,8 @@ export namespace Prisma {
     readonly reviews: FieldRef<"Product", 'Int'>
     readonly createdAt: FieldRef<"Product", 'DateTime'>
     readonly updatedAt: FieldRef<"Product", 'DateTime'>
+    readonly pet: FieldRef<"Product", 'String'>
+    readonly brand: FieldRef<"Product", 'String'>
   }
     
 
@@ -1995,7 +2021,9 @@ export namespace Prisma {
     image: 'image',
     reviews: 'reviews',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    pet: 'pet',
+    brand: 'brand'
   };
 
   export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
@@ -2095,6 +2123,8 @@ export namespace Prisma {
     reviews?: IntFilter<"Product"> | number
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
+    pet?: StringFilter<"Product"> | string
+    brand?: StringFilter<"Product"> | string
   }
 
   export type ProductOrderByWithRelationInput = {
@@ -2108,6 +2138,8 @@ export namespace Prisma {
     reviews?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    pet?: SortOrder
+    brand?: SortOrder
   }
 
   export type ProductWhereUniqueInput = Prisma.AtLeast<{
@@ -2124,6 +2156,8 @@ export namespace Prisma {
     reviews?: IntFilter<"Product"> | number
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
+    pet?: StringFilter<"Product"> | string
+    brand?: StringFilter<"Product"> | string
   }, "id">
 
   export type ProductOrderByWithAggregationInput = {
@@ -2137,6 +2171,8 @@ export namespace Prisma {
     reviews?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    pet?: SortOrder
+    brand?: SortOrder
     _count?: ProductCountOrderByAggregateInput
     _avg?: ProductAvgOrderByAggregateInput
     _max?: ProductMaxOrderByAggregateInput
@@ -2158,6 +2194,8 @@ export namespace Prisma {
     reviews?: IntWithAggregatesFilter<"Product"> | number
     createdAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
+    pet?: StringWithAggregatesFilter<"Product"> | string
+    brand?: StringWithAggregatesFilter<"Product"> | string
   }
 
   export type ProductCreateInput = {
@@ -2171,6 +2209,8 @@ export namespace Prisma {
     reviews: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    pet: string
+    brand: string
   }
 
   export type ProductUncheckedCreateInput = {
@@ -2184,6 +2224,8 @@ export namespace Prisma {
     reviews: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    pet: string
+    brand: string
   }
 
   export type ProductUpdateInput = {
@@ -2197,6 +2239,8 @@ export namespace Prisma {
     reviews?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    pet?: StringFieldUpdateOperationsInput | string
+    brand?: StringFieldUpdateOperationsInput | string
   }
 
   export type ProductUncheckedUpdateInput = {
@@ -2210,6 +2254,8 @@ export namespace Prisma {
     reviews?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    pet?: StringFieldUpdateOperationsInput | string
+    brand?: StringFieldUpdateOperationsInput | string
   }
 
   export type ProductCreateManyInput = {
@@ -2223,6 +2269,8 @@ export namespace Prisma {
     reviews: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    pet: string
+    brand: string
   }
 
   export type ProductUpdateManyMutationInput = {
@@ -2236,6 +2284,8 @@ export namespace Prisma {
     reviews?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    pet?: StringFieldUpdateOperationsInput | string
+    brand?: StringFieldUpdateOperationsInput | string
   }
 
   export type ProductUncheckedUpdateManyInput = {
@@ -2249,6 +2299,8 @@ export namespace Prisma {
     reviews?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    pet?: StringFieldUpdateOperationsInput | string
+    brand?: StringFieldUpdateOperationsInput | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -2310,6 +2362,8 @@ export namespace Prisma {
     reviews?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    pet?: SortOrder
+    brand?: SortOrder
   }
 
   export type ProductAvgOrderByAggregateInput = {
@@ -2329,6 +2383,8 @@ export namespace Prisma {
     reviews?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    pet?: SortOrder
+    brand?: SortOrder
   }
 
   export type ProductMinOrderByAggregateInput = {
@@ -2342,6 +2398,8 @@ export namespace Prisma {
     reviews?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    pet?: SortOrder
+    brand?: SortOrder
   }
 
   export type ProductSumOrderByAggregateInput = {
