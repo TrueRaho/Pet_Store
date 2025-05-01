@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
@@ -25,18 +25,23 @@ interface Filters {
 interface ProductFilterProps {
   products: Product[]
   onFilterChange: (filteredProducts: Product[]) => void
+  initialCategory?: string
+  initialPet?: string
 }
 
-export default function ProductFilter({ products, onFilterChange }: ProductFilterProps) {
-  const [filters, setFilters] = useState<Filters>({
-    category: [],
-    pet: [],
-    brand: [],
-    price: [0, 1000],
-  })
+export default function ProductFilter({ products, onFilterChange, initialCategory, initialPet }: ProductFilterProps) {
+  console.log("ProductFilter received:", { initialCategory, initialPet, productsCount: products.length });
   
-  // Используем useRef для отслеживания первого рендера
-  const isFirstRender = useRef(true)
+  // Инициализация фильтров с начальными значениями из URL
+  const [filters, setFilters] = useState<Filters>(() => {
+    console.log("Initializing filters with:", { initialCategory, initialPet });
+    return {
+      category: initialCategory ? [initialCategory] : [],
+      pet: initialPet ? [initialPet] : [],
+      brand: [],
+      price: [0, 1000],
+    };
+  });
 
   const handleFilterChange = (type: keyof Filters, value: string | [number, number]) => {
     setFilters((prev) => {
@@ -57,15 +62,10 @@ export default function ProductFilter({ products, onFilterChange }: ProductFilte
     })
   }
 
-  // Применяем фильтры только после изменения состояния, а не при первом рендере
-  useEffect(() => {
-    // Пропускаем первый рендер
-    if (isFirstRender.current) {
-      isFirstRender.current = false
-      return
-    }
-    
-    const filteredProducts = products.filter((product) => {
+  // Функция для фильтрации продуктов
+  const filterProducts = () => {
+    console.log("Applying filters:", filters);
+    const filtered = products.filter((product) => {
       if (filters.category.length > 0 && !filters.category.includes(product.category)) {
         return false
       }
@@ -79,10 +79,28 @@ export default function ProductFilter({ products, onFilterChange }: ProductFilte
         return false
       }
       return true
-    })
-
-    onFilterChange(filteredProducts)
-  }, [filters, products, onFilterChange])
+    });
+    
+    console.log(`Filtered products: ${filtered.length} of ${products.length}`);
+    return filtered;
+  };
+  
+  // Применяем фильтры при изменении любого из параметров фильтрации или списка продуктов
+  useEffect(() => {
+    const filteredProducts = filterProducts();
+    onFilterChange(filteredProducts);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters, products, onFilterChange]);
+  
+  // При изменении initialCategory или initialPet обновляем фильтры
+  useEffect(() => {
+    console.log("URL params changed:", { initialCategory, initialPet });
+    setFilters(prev => ({
+      ...prev,
+      category: initialCategory ? [initialCategory] : prev.category,
+      pet: initialPet ? [initialPet] : prev.pet
+    }));
+  }, [initialCategory, initialPet]);
 
   return (
     <div className="w-full md:w-64 shrink-0">

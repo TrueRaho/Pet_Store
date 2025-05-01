@@ -26,11 +26,15 @@ interface ProductCardProps {
 
 interface CatalogClientProps {
   initialProducts: Product[]
+  initialCategory?: string
+  initialPet?: string
 }
 
-export default function CatalogClient({ initialProducts }: CatalogClientProps) {
+export default function CatalogClient({ initialProducts, initialCategory, initialPet }: CatalogClientProps) {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(initialProducts)
   const [displayedProducts, setDisplayedProducts] = useState<Product[]>(initialProducts)
+
+  console.log("CatalogClient received:", { initialCategory, initialPet });
 
   const handleFilterChange = useCallback((newFilteredProducts: Product[]) => {
     setFilteredProducts(newFilteredProducts)
@@ -43,7 +47,12 @@ export default function CatalogClient({ initialProducts }: CatalogClientProps) {
 
   return (
     <div className="flex flex-col md:flex-row gap-8">
-      <ProductFilter products={initialProducts} onFilterChange={handleFilterChange} />
+      <ProductFilter 
+        products={initialProducts} 
+        onFilterChange={handleFilterChange} 
+        initialCategory={initialCategory}
+        initialPet={initialPet}
+      />
 
       <div className="flex-1">
         <ProductSorting products={filteredProducts} onSort={handleSort} />
