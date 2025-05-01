@@ -7,6 +7,8 @@ export interface Product {
   image: string
   rating: number
   reviews: number
+  pet: string
+  brand: string
 }
 
 export interface ProductListResponse {

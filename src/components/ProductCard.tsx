@@ -21,7 +21,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
         <div className="p-4">
           <h3 className="font-medium mb-2 line-clamp-2">{product.name}</h3>
-          <p className="text-sm text-gray-500 mb-2">{product.category}</p>
           <div className="flex justify-between items-center">
             <span className="font-semibold">{product.price} ₴</span>
             <Button size="sm" className="bg-[#a8d5a2] hover:bg-[#97c491] text-white">

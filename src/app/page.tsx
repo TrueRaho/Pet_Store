@@ -5,72 +5,26 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Search, Gift, Heart } from "lucide-react"
 import { Product } from "@/types/product"
 import ProductCard from "@/components/ProductCard"
+import { getRecommendedProducts, getProductsByCategoryAndPet, getProductsByPet } from "@/services/productService"
 
-// Імітація даних продуктів
-const FEATURED_PRODUCTS: Product[] = [
-  {
-    id: "1",
-    name: "Корм для собак преміум Royal Canin",
-    price: 599,
-    category: "food",
-    description: "Високоякісний сухий корм для дорослих собак середніх порід.",
-    rating: 4.5,
-    image: "/placeholder.svg?height=250&width=250",
-    reviews: 128
-  },
-  {
-    id: "2",
-    name: "Іграшка для котів 'Миша'",
-    price: 199,
-    category: "toys",
-    description: "М'яка іграшка у формі миші з натуральних матеріалів.",
-    rating: 4.2,
-    image: "/placeholder.svg?height=250&width=250",
-    reviews: 85
-  },
-  {
-    id: "3",
-    name: "Шампунь для собак",
-    price: 249,
-    category: "care",
-    description: "Делікатний шампунь для собак усіх порід.",
-    rating: 4.3,
-    image: "/placeholder.svg?height=250&width=250",
-    reviews: 64
-  },
-  {
-    id: "4",
-    name: "Лежак для котів",
-    price: 899,
-    category: "accessories",
-    description: "М'який та комфортний лежак для котів.",
-    rating: 4.7,
-    image: "/placeholder.svg?height=250&width=250",
-    reviews: 50
-  },
-  {
-    id: "5",
-    name: "Корм для котів сухий",
-    price: 499,
-    category: "food",
-    description: "Збалансований сухий корм для дорослих котів.",
-    rating: 4.4,
-    image: "/placeholder.svg?height=250&width=250",
-    reviews: 36
-  },
-  {
-    id: "6",
-    name: "М'ячик для собак",
-    price: 149,
-    category: "toys",
-    description: "Міцний гумовий м'ячик для активних ігор.",
-    rating: 4.6,
-    image: "/placeholder.svg?height=250&width=250",
-    reviews: 24
-  }
-]
+export const dynamic = 'force-dynamic';
 
-export default function Home() {
+// Компонент главной страницы
+export default async function Home() {
+  // Получение рекомендованных продуктов из API
+  const featuredProducts = await getRecommendedProducts(6);
+  
+  // Получение товаров для категорий по типу животного
+  const dogFood = await getProductsByCategoryAndPet("food", "dog", 1);
+  const dogToys = await getProductsByCategoryAndPet("toys", "dog", 1);
+  const dogAccessories = await getProductsByCategoryAndPet("accessories", "dog", 1);
+  
+  const catFood = await getProductsByCategoryAndPet("food", "cat", 1);
+  const catToys = await getProductsByCategoryAndPet("toys", "cat", 1);
+  const catAccessories = await getProductsByCategoryAndPet("accessories", "cat", 1);
+  
+  const otherPetProducts = await getProductsByPet("other", 3);
+  
   return (
     <div className="page-transition">
       {/* Головні категорії */}
@@ -129,7 +83,7 @@ export default function Home() {
                   <div className="grid grid-cols-3 gap-2">
                     <div className="aspect-square relative rounded overflow-hidden">
                       <Image
-                        src="/placeholder.svg?height=100&width=100"
+                        src={dogFood.length > 0 ? dogFood[0].image : "/placeholder.svg?height=100&width=100"}
                         alt="Корм для собак"
                         fill
                         className="object-cover"
@@ -137,7 +91,7 @@ export default function Home() {
                     </div>
                     <div className="aspect-square relative rounded overflow-hidden">
                       <Image
-                        src="/placeholder.svg?height=100&width=100"
+                        src={dogToys.length > 0 ? dogToys[0].image : "/placeholder.svg?height=100&width=100"}
                         alt="Іграшки для собак"
                         fill
                         className="object-cover"
@@ -145,7 +99,7 @@ export default function Home() {
                     </div>
                     <div className="aspect-square relative rounded overflow-hidden">
                       <Image
-                        src="/placeholder.svg?height=100&width=100"
+                        src={dogAccessories.length > 0 ? dogAccessories[0].image : "/placeholder.svg?height=100&width=100"}
                         alt="Аксесуари для собак"
                         fill
                         className="object-cover"
@@ -165,7 +119,7 @@ export default function Home() {
                   <div className="grid grid-cols-3 gap-2">
                     <div className="aspect-square relative rounded overflow-hidden">
                       <Image
-                        src="/placeholder.svg?height=100&width=100"
+                        src={catFood.length > 0 ? catFood[0].image : "/placeholder.svg?height=100&width=100"}
                         alt="Корм для котів"
                         fill
                         className="object-cover"
@@ -173,7 +127,7 @@ export default function Home() {
                     </div>
                     <div className="aspect-square relative rounded overflow-hidden">
                       <Image
-                        src="/placeholder.svg?height=100&width=100"
+                        src={catToys.length > 0 ? catToys[0].image : "/placeholder.svg?height=100&width=100"}
                         alt="Іграшки для котів"
                         fill
                         className="object-cover"
@@ -181,7 +135,7 @@ export default function Home() {
                     </div>
                     <div className="aspect-square relative rounded overflow-hidden">
                       <Image
-                        src="/placeholder.svg?height=100&width=100"
+                        src={catAccessories.length > 0 ? catAccessories[0].image : "/placeholder.svg?height=100&width=100"}
                         alt="Аксесуари для котів"
                         fill
                         className="object-cover"
@@ -199,30 +153,45 @@ export default function Home() {
                 <div className="p-4">
                   <h3 className="text-xl font-semibold mb-4">Для інших тварин</h3>
                   <div className="grid grid-cols-3 gap-2">
-                    <div className="aspect-square relative rounded overflow-hidden">
-                      <Image
-                        src="/placeholder.svg?height=100&width=100"
-                        alt="Товари для гризунів"
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <div className="aspect-square relative rounded overflow-hidden">
-                      <Image
-                        src="/placeholder.svg?height=100&width=100"
-                        alt="Товари для птахів"
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <div className="aspect-square relative rounded overflow-hidden">
-                      <Image
-                        src="/placeholder.svg?height=100&width=100"
-                        alt="Товари для риб"
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
+                    {otherPetProducts.length > 0 ? (
+                      otherPetProducts.map((product: Product, index: number) => (
+                        <div key={product.id} className="aspect-square relative rounded overflow-hidden">
+                          <Image
+                            src={product.image}
+                            alt={product.name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <>
+                        <div className="aspect-square relative rounded overflow-hidden">
+                          <Image
+                            src="/placeholder.svg?height=100&width=100"
+                            alt="Товари для гризунів"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="aspect-square relative rounded overflow-hidden">
+                          <Image
+                            src="/placeholder.svg?height=100&width=100"
+                            alt="Товари для птахів"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="aspect-square relative rounded overflow-hidden">
+                          <Image
+                            src="/placeholder.svg?height=100&width=100"
+                            alt="Товари для риб"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -235,7 +204,7 @@ export default function Home() {
       <section className="container mx-auto px-4 py-8">
         <h2 className="text-2xl font-semibold mb-6">Ми підібрали для вас</h2>
         <div className="flex overflow-x-auto pb-4 gap-6 hide-scrollbar">
-          {FEATURED_PRODUCTS.map((product) => (
+          {featuredProducts.map((product) => (
             <div key={product.id} className="min-w-[250px]">
               <ProductCard product={product} />
             </div>

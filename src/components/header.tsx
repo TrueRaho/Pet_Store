@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, FormEvent } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Search, User, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -8,6 +9,16 @@ import { Input } from "@/components/ui/input"
 
 export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const router = useRouter()
+
+  const handleSearch = (event: FormEvent) => {
+    event.preventDefault()
+    
+    if (searchQuery.trim()) {
+      router.push(`/search?query=${encodeURIComponent(searchQuery)}`)
+    }
+  }
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-[#f8f5f0] border-b border-[#e8e5e0] z-50">
@@ -41,10 +52,18 @@ export default function Header() {
         </Link>
 
         <div className="hidden md:flex items-center justify-center flex-1 mx-4">
-          <div className="relative w-full max-w-md">
-            <Input type="search" placeholder="Пошук товарів..." className="pl-10 bg-white border-[#e8e5e0]" />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          </div>
+          <form onSubmit={handleSearch} className="relative w-full max-w-md">
+            <Input 
+              type="search" 
+              placeholder="Пошук товарів..." 
+              className="pl-10 bg-white border-[#e8e5e0]" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button type="submit" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <Search className="h-4 w-4" />
+            </button>
+          </form>
         </div>
 
         <div className="flex items-center gap-4">
@@ -71,10 +90,18 @@ export default function Header() {
 
       {isSearchOpen && (
         <div className="md:hidden p-4 border-t border-[#e8e5e0] bg-[#f8f5f0]">
-          <div className="relative">
-            <Input type="search" placeholder="Пошук товарів..." className="pl-10 bg-white border-[#e8e5e0]" />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          </div>
+          <form onSubmit={handleSearch} className="relative">
+            <Input 
+              type="search" 
+              placeholder="Пошук товарів..." 
+              className="pl-10 bg-white border-[#e8e5e0]" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button type="submit" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <Search className="h-4 w-4" />
+            </button>
+          </form>
         </div>
       )}
     </header>
