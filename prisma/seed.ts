@@ -104,27 +104,53 @@ const PRODUCTS = [
   }
 ]
 
+const USERS = [
+  {
+    firstName: "Олександр",
+    lastName: "Петренко",
+    email: "user@example.com",
+    password: "password123", // В реальном проекте нужно использовать хеширование
+    phone: "+380501234567",
+    address: "вул. Хрещатик, 1, кв. 10",
+    city: "Київ",
+    zipCode: "01001",
+  }
+]
+
 async function main() {
-  console.log('Починаємо заповнення бази даних...')
-  
-  // Очищаем таблицу продуктов перед заполнением
-  await prisma.product.deleteMany()
-  
-  // Загружаем тестовые данные
+  console.log(`Начало заполнения базы данных...`)
+
+  // Создаем товары
   for (const product of PRODUCTS) {
-    await prisma.product.create({
-      data: product,
+    await prisma.product.upsert({
+      where: { id: product.name }, // Используем имя как уникальный идентификатор (для демо)
+      update: {},
+      create: product,
+    }).catch(e => {
+      console.error(`Ошибка при создании товара ${product.name}:`, e)
     })
   }
-  
-  console.log('База даних успішно заповнена!')
+
+  // Создаем пользователей
+  for (const user of USERS) {
+    await prisma.user.upsert({
+      where: { email: user.email },
+      update: {},
+      create: user,
+    }).catch(e => {
+      console.error(`Ошибка при создании пользователя ${user.email}:`, e)
+    })
+  }
+
+  console.log(`База данных заполнена.`)
 }
 
 main()
-  .catch((e) => {
-    console.error(e)
-    process.exit(1)
-  })
-  .finally(async () => {
+  .then(async () => {
     await prisma.$disconnect()
+  })
+  .catch(async (e) => {
+    console.error(e)
+    await prisma.$disconnect()
+    process.exit(1)
   }) 

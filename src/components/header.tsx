@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, FormEvent } from "react"
+import { useState, FormEvent, useEffect } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
 import { Search, User, ShoppingCart } from "lucide-react"
@@ -14,6 +14,13 @@ export default function Header() {
   const router = useRouter()
   const pathname = usePathname() // Хук для отслеживания изменения пути
   const { itemsCount } = useCart() // Используем контекст корзины
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  // Проверяем, авторизован ли пользователь
+  useEffect(() => {
+    const user = localStorage.getItem("user")
+    setIsLoggedIn(!!user)
+  }, [pathname])
 
   const handleSearch = (event: FormEvent) => {
     event.preventDefault()
@@ -73,10 +80,10 @@ export default function Header() {
           <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsSearchOpen(!isSearchOpen)}>
             <Search className="h-5 w-5" />
           </Button>
-          <Link href="/profile">
+          <Link href={isLoggedIn ? "/profile" : "/login"}>
             <Button variant="ghost" size="icon">
               <User className="h-5 w-5" />
-              <span className="sr-only">Профіль</span>
+              <span className="sr-only">{isLoggedIn ? "Профіль" : "Увійти"}</span>
             </Button>
           </Link>
           <Link href="/cart">

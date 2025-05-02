@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, ChangeEvent, FormEvent } from "react"
+import { useState, useEffect, ChangeEvent, FormEvent } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -8,16 +9,18 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { User, Package, LogOut } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
-// Імітація даних користувача
-const userData = {
-  firstName: "Олександр",
-  lastName: "Петренко",
-  email: "oleksandr@example.com",
-  phone: "+380501234567",
-  address: "вул. Хрещатик, 1, кв. 10",
-  city: "Київ",
-  zipCode: "01001",
+// Интерфейс для пользователя
+interface UserProfile {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone: string | null
+  address: string | null
+  city: string | null
+  zipCode: string | null
 }
 
 // Імітація даних замовлень
@@ -46,19 +49,98 @@ const orderData = [
 ]
 
 export default function ProfilePage() {
-  const [user, setUser] = useState(userData)
+  const [user, setUser] = useState<UserProfile | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [updateSuccess, setUpdateSuccess] = useState(false)
+  const router = useRouter()
 
+  // Загрузка профиля пользователя
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      try {
+        // Проверяем, авторизован ли пользователь
+        const savedUser = localStorage.getItem("user")
+        
+        if (!savedUser) {
+          // Если пользователь не авторизован, перенаправляем на страницу входа
+          router.push("/login")
+          return
+        }
+        
+        const userData = JSON.parse(savedUser)
+        
+        // Загружаем актуальные данные пользователя с сервера
+        const response = await fetch(`/api/profile?email=${userData.email}`)
+        
+        if (!response.ok) {
+          throw new Error("Не вдалося завантажити профіль")
+        }
+        
+        const profileData = await response.json()
+        setUser(profileData)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Помилка завантаження профілю")
+        console.error("Ошибка загрузки профиля:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    loadUserProfile()
+  }, [router])
+
+  // Обработка изменения полей формы
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setUser((prev) => ({ ...prev, [name]: value }))
+    if (user) {
+      setUser((prev) => prev ? { ...prev, [name]: value } : null)
+    }
   }
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  // Отправка формы для обновления профиля
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // Тут була б логіка оновлення даних користувача
-    alert("Дані успішно оновлено")
+    
+    if (!user) return
+    
+    setError(null)
+    setUpdateSuccess(false)
+    
+    try {
+      const response = await fetch("/api/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      })
+      
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || "Не вдалося оновити профіль")
+      }
+      
+      const updatedUser = await response.json()
+      
+      // Обновляем пользователя в состоянии и localStorage
+      setUser(updatedUser)
+      localStorage.setItem("user", JSON.stringify(updatedUser))
+      
+      setUpdateSuccess(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Помилка оновлення профілю")
+      console.error("Ошибка обновления профиля:", err)
+    }
   }
 
+  // Выход из системы
+  const handleLogout = () => {
+    localStorage.removeItem("user")
+    router.push("/login")
+  }
+
+  // Получение статуса заказа
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "completed":
@@ -70,6 +152,21 @@ export default function ProfilePage() {
       default:
         return <Badge className="bg-gray-500">В очікуванні</Badge>
     }
+  }
+
+  // Отображение сообщения загрузки
+  if (loading) {
+    return (
+      <div className="page-transition container mx-auto px-4 py-8 text-center">
+        <p>Завантаження профілю...</p>
+      </div>
+    )
+  }
+
+  // Если пользователь не авторизован, показываем пустую страницу
+  // (Перенаправление на /login происходит в useEffect)
+  if (!user) {
+    return null
   }
 
   return (
@@ -91,6 +188,20 @@ export default function ProfilePage() {
         <TabsContent value="profile">
           <Card className="border-[#e8e5e0]">
             <CardContent className="p-6">
+              {error && (
+                <Alert variant="destructive" className="mb-6">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              
+              {updateSuccess && (
+                <Alert className="mb-6 bg-green-50 border-green-200">
+                  <AlertDescription className="text-green-800">
+                    Профіль успішно оновлено
+                  </AlertDescription>
+                </Alert>
+              )}
+              
               <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
@@ -133,7 +244,7 @@ export default function ProfilePage() {
                       id="phone"
                       name="phone"
                       type="tel"
-                      value={user.phone}
+                      value={user.phone || ""}
                       onChange={handleChange}
                       className="border-[#e8e5e0]"
                     />
@@ -144,7 +255,7 @@ export default function ProfilePage() {
                     <Input
                       id="address"
                       name="address"
-                      value={user.address}
+                      value={user.address || ""}
                       onChange={handleChange}
                       className="border-[#e8e5e0]"
                     />
@@ -155,7 +266,7 @@ export default function ProfilePage() {
                     <Input
                       id="city"
                       name="city"
-                      value={user.city}
+                      value={user.city || ""}
                       onChange={handleChange}
                       className="border-[#e8e5e0]"
                     />
@@ -166,7 +277,7 @@ export default function ProfilePage() {
                     <Input
                       id="zipCode"
                       name="zipCode"
-                      value={user.zipCode}
+                      value={user.zipCode || ""}
                       onChange={handleChange}
                       className="border-[#e8e5e0]"
                     />
@@ -178,7 +289,12 @@ export default function ProfilePage() {
                     Зберегти зміни
                   </Button>
 
-                  <Button variant="outline" className="text-red-500 border-red-200 hover:bg-red-50">
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    className="text-red-500 border-red-200 hover:bg-red-50"
+                    onClick={handleLogout}
+                  >
                     <LogOut className="h-4 w-4 mr-2" />
                     Вийти
                   </Button>
