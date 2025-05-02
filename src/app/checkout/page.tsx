@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -8,7 +9,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { CheckCircle2 } from "lucide-react"
+import { useCart } from "@/context/CartContext"
 
 interface FormState {
   firstName: string
@@ -23,6 +26,13 @@ interface FormState {
 }
 
 export default function CheckoutPage() {
+  const { cartItems, clearCart, itemsCount } = useCart()
+  const router = useRouter()
+  const [user, setUser] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  
   const [formState, setFormState] = useState<FormState>({
     firstName: "",
     lastName: "",
@@ -35,7 +45,37 @@ export default function CheckoutPage() {
     paymentMethod: "card",
   })
 
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  // Загружаем информацию о пользователе, если она есть
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user")
+    
+    if (savedUser) {
+      const userData = JSON.parse(savedUser)
+      setUser(userData)
+      
+      // Заполняем форму данными пользователя
+      setFormState(prev => ({
+        ...prev,
+        firstName: userData.firstName || prev.firstName,
+        lastName: userData.lastName || prev.lastName,
+        email: userData.email || prev.email,
+        phone: userData.phone || prev.phone,
+        address: userData.address || prev.address,
+        city: userData.city || prev.city,
+        postalCode: userData.zipCode || prev.postalCode
+      }))
+    } else {
+      // Если пользователь не авторизован, перенаправляем на страницу логина
+      router.push('/login?redirect=checkout')
+    }
+  }, [router])
+
+  // Проверяем, что корзина не пуста
+  useEffect(() => {
+    if (itemsCount === 0) {
+      router.push('/cart')
+    }
+  }, [itemsCount, router])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -46,10 +86,56 @@ export default function CheckoutPage() {
     setFormState((prev) => ({ ...prev, paymentMethod: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // Тут була б логіка відправки замовлення на сервер
-    setIsSubmitted(true)
+    
+    if (!user || cartItems.length === 0) {
+      setError("Помилка при оформленні замовлення. Перевірте авторизацію та наявність товарів у кошику.")
+      return
+    }
+
+    setIsLoading(true)
+    setError(null)
+    
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          items: cartItems,
+          total: calculateTotal(),
+          address: formState.address,
+          city: formState.city,
+          phone: formState.phone,
+          notes: formState.notes
+        }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || "Помилка при створенні замовлення")
+      }
+
+      // Очищаем корзину
+      clearCart()
+      setIsSubmitted(true)
+      
+      // После небольшой задержки для показа благодарственного экрана, перенаправляем на профиль
+      setTimeout(() => {
+        router.push('/profile')
+      }, 3000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Невідома помилка")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   if (isSubmitted) {
@@ -61,17 +147,30 @@ export default function CheckoutPage() {
           <p className="text-gray-600 mb-8">
             Ваше замовлення успішно оформлено. Ми зв'яжемося з вами найближчим часом для підтвердження.
           </p>
-          <Link href="/">
-            <Button className="bg-[#a8d5a2] hover:bg-[#97c491] text-white">Повернутися на головну</Button>
+          <p className="text-gray-600 mb-8">
+            Зараз вас буде перенаправлено на сторінку профілю...
+          </p>
+          <Link href="/profile">
+            <Button className="bg-[#a8d5a2] hover:bg-[#97c491] text-white">Перейти до профілю</Button>
           </Link>
         </div>
       </div>
     )
   }
 
+  if (!user || cartItems.length === 0) {
+    return <div className="container mx-auto px-4 py-8">Завантаження...</div>
+  }
+
   return (
     <div className="page-transition container mx-auto px-4 py-8">
       <h1 className="text-2xl font-semibold mb-6">Оформлення замовлення</h1>
+
+      {error && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-1">
@@ -212,8 +311,12 @@ export default function CheckoutPage() {
               </CardContent>
             </Card>
 
-            <Button type="submit" className="w-full bg-[#a8d5a2] hover:bg-[#97c491] text-white">
-              Підтвердити замовлення
+            <Button 
+              type="submit" 
+              className="w-full bg-[#a8d5a2] hover:bg-[#97c491] text-white"
+              disabled={isLoading}
+            >
+              {isLoading ? "Обробка замовлення..." : "Підтвердити замовлення"}
             </Button>
           </form>
         </div>
@@ -224,25 +327,20 @@ export default function CheckoutPage() {
               <h2 className="font-semibold text-lg mb-4">Ваше замовлення</h2>
 
               <div className="space-y-3 mb-6">
-                <div className="flex justify-between">
-                  <span>Корм для собак преміум</span>
-                  <span>599 ₴</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Шампунь для собак (x2)</span>
-                  <span>498 ₴</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>М'ячик для собак</span>
-                  <span>149 ₴</span>
-                </div>
+                {cartItems.map(item => (
+                  <div key={item.id} className="flex justify-between">
+                    <span>{item.name} {item.quantity > 1 ? `(x${item.quantity})` : ''}</span>
+                    <span>{item.price * item.quantity} ₴</span>
+                  </div>
+                ))}
+                
                 <div className="flex justify-between text-gray-600">
                   <span>Доставка:</span>
                   <span>Безкоштовно</span>
                 </div>
                 <div className="pt-3 border-t border-[#e8e5e0] flex justify-between font-semibold">
                   <span>Разом:</span>
-                  <span>1246 ₴</span>
+                  <span>{calculateTotal()} ₴</span>
                 </div>
               </div>
 

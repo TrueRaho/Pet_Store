@@ -2,6 +2,7 @@
 
 import { useState, useEffect, ChangeEvent, FormEvent } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -10,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { User, Package, LogOut } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import Link from "next/link"
 
 // Интерфейс для пользователя
 interface UserProfile {
@@ -23,33 +25,30 @@ interface UserProfile {
   zipCode: string | null
 }
 
-// Імітація даних замовлень
-const orderData = [
-  {
-    id: "ORD-2023-001",
-    date: "2023-12-15",
-    status: "completed",
-    total: 1246,
-    items: [
-      { name: "Корм для собак преміум", quantity: 1, price: 599 },
-      { name: "Шампунь для собак", quantity: 2, price: 249 },
-      { name: "М'ячик для собак", quantity: 1, price: 149 },
-    ],
-  },
-  {
-    id: "ORD-2023-002",
-    date: "2024-01-05",
-    status: "processing",
-    total: 748,
-    items: [
-      { name: "Лежак для котів", quantity: 1, price: 899 },
-      { name: "Наповнювач для котів", quantity: 1, price: 349 },
-    ],
-  },
-]
+// Интерфейс для товара в заказе
+interface OrderItem {
+  id: string
+  name: string
+  price: number
+  quantity: number
+  image: string | null
+}
+
+// Интерфейс для заказа
+interface Order {
+  id: string
+  status: string
+  total: number
+  createdAt: string
+  items: OrderItem[]
+  address: string | null
+  city: string | null
+  phone: string | null
+}
 
 export default function ProfilePage() {
   const [user, setUser] = useState<UserProfile | null>(null)
+  const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [updateSuccess, setUpdateSuccess] = useState(false)
@@ -71,14 +70,22 @@ export default function ProfilePage() {
         const userData = JSON.parse(savedUser)
         
         // Загружаем актуальные данные пользователя с сервера
-        const response = await fetch(`/api/profile?email=${userData.email}`)
+        const userResponse = await fetch(`/api/profile?email=${userData.email}`)
         
-        if (!response.ok) {
+        if (!userResponse.ok) {
           throw new Error("Не вдалося завантажити профіль")
         }
         
-        const profileData = await response.json()
+        const profileData = await userResponse.json()
         setUser(profileData)
+        
+        // Загружаем заказы пользователя
+        const ordersResponse = await fetch(`/api/orders?userId=${profileData.id}`)
+        
+        if (ordersResponse.ok) {
+          const ordersData = await ordersResponse.json()
+          setOrders(ordersData)
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Помилка завантаження профілю")
         console.error("Ошибка загрузки профиля:", err)
@@ -152,6 +159,15 @@ export default function ProfilePage() {
       default:
         return <Badge className="bg-gray-500">В очікуванні</Badge>
     }
+  }
+
+  // Форматирование даты
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("uk-UA", {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })
   }
 
   // Отображение сообщения загрузки
@@ -306,37 +322,66 @@ export default function ProfilePage() {
 
         <TabsContent value="orders">
           <div className="space-y-6">
-            {orderData.map((order) => (
-              <Card key={order.id} className="border-[#e8e5e0]">
-                <CardContent className="p-6">
-                  <div className="flex flex-wrap justify-between items-start gap-4 mb-4">
-                    <div>
-                      <h3 className="font-semibold">Замовлення {order.id}</h3>
-                      <p className="text-gray-600 text-sm">Дата: {new Date(order.date).toLocaleDateString("uk-UA")}</p>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      {getStatusBadge(order.status)}
-                      <span className="font-semibold">{order.total} ₴</span>
-                    </div>
-                  </div>
-
-                  <div className="border-t border-[#e8e5e0] pt-4">
-                    <h4 className="font-medium mb-2">Товари:</h4>
-                    <ul className="space-y-2">
-                      {order.items.map((item, index) => (
-                        <li key={index} className="flex justify-between text-sm">
-                          <span>
-                            {item.name} {item.quantity > 1 && `(x${item.quantity})`}
-                          </span>
-                          <span>{item.price * item.quantity} ₴</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+            {orders.length === 0 ? (
+              <Card className="border-[#e8e5e0]">
+                <CardContent className="p-6 text-center">
+                  <Package className="h-10 w-10 mx-auto mb-4 text-gray-400" />
+                  <h3 className="font-semibold mb-2">У вас ще немає замовлень</h3>
+                  <p className="text-gray-600 mb-4">Перейдіть до каталогу, щоб зробити своє перше замовлення</p>
+                  <Button asChild className="bg-[#a8d5a2] hover:bg-[#97c491] text-white">
+                    <Link href="/catalog">Перейти до каталогу</Link>
+                  </Button>
                 </CardContent>
               </Card>
-            ))}
+            ) : (
+              orders.map((order) => (
+                <Card key={order.id} className="border-[#e8e5e0]">
+                  <CardContent className="p-6">
+                    <div className="flex flex-wrap justify-between items-start gap-4 mb-4">
+                      <div>
+                        <h3 className="font-semibold">Замовлення {order.id.slice(0, 8).toUpperCase()}</h3>
+                        <p className="text-gray-600 text-sm">Дата: {formatDate(order.createdAt)}</p>
+                        {order.address && order.city && (
+                          <p className="text-gray-600 text-sm">Адреса: {order.city}, {order.address}</p>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        {getStatusBadge(order.status)}
+                        <span className="font-semibold">{order.total} ₴</span>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-[#e8e5e0] pt-4">
+                      <h4 className="font-medium mb-2">Товари:</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {order.items.map((item) => (
+                          <div key={item.id} className="flex gap-3">
+                            {item.image && (
+                              <div className="relative w-14 h-14 rounded overflow-hidden shrink-0">
+                                <Image
+                                  src={item.image}
+                                  alt={item.name}
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                            )}
+                            <div className="flex-1">
+                              <div className="font-medium">{item.name}</div>
+                              <div className="text-sm text-gray-600 flex justify-between">
+                                <span>{item.quantity} шт. × {item.price} ₴</span>
+                                <span className="font-medium">{item.price * item.quantity} ₴</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
         </TabsContent>
       </Tabs>
