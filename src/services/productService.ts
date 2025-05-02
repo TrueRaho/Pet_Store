@@ -1,7 +1,7 @@
 import { Product } from "@/types/product";
 
 // Получение базового URL в зависимости от окружения
-function getBaseUrl() {
+export function getBaseUrl() {
   if (typeof window !== 'undefined') {
     // Клиентская сторона: используем относительный путь
     return '';

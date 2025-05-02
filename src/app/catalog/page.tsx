@@ -1,4 +1,5 @@
 import CatalogClient from "@/components/catalog/CatalogClient"
+import { getBaseUrl } from "@/services/productService"; // Импортируем функцию
 
 // Явное указание динамической страницы в Next.js 15+
 export const dynamic = 'force-dynamic';
@@ -19,7 +20,8 @@ interface PageProps {
 
 async function getProducts(): Promise<Product[]> {
   try {
-    const res = await fetch('http://localhost:3000/api/products', { next: { revalidate: 0 } })
+    const baseUrl = getBaseUrl(); // Получаем базовый URL
+    const res = await fetch(`${baseUrl}/api/products`, { next: { revalidate: 0 } }) // Используем baseUrl
     
     if (!res.ok) {
       throw new Error('Ошибка при загрузке товаров')
