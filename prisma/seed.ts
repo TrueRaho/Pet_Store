@@ -11,7 +11,7 @@ const PRODUCTS = [
     brand: "Royal Canin",
     description: "Високоякісний сухий корм для дорослих собак середніх порід. Збалансований склад забезпечує здоров'я та енергію вашого улюбленця на весь день.",
     rating: 4.5,
-    image: "/placeholder.svg?height=500&width=500",
+    image: "/RoyalCanin.png",
     reviews: 128,
   },
   {
@@ -22,7 +22,7 @@ const PRODUCTS = [
     brand: "PetPlay",
     description: "М'яка іграшка у формі миші з натуральних матеріалів. Ідеальна для активних ігор вашого кота.",
     rating: 4.2,
-    image: "/placeholder.svg?height=500&width=500",
+    image: "/CatToy.png",
     reviews: 85,
   },
   {
@@ -33,7 +33,7 @@ const PRODUCTS = [
     brand: "PetCare",
     description: "Делікатний шампунь для собак усіх порід. Дбайливо очищує та доглядає за шерстю.",
     rating: 4.3,
-    image: "/placeholder.svg?height=500&width=500",
+    image: "/DogShampoo.png",
     reviews: 64,
   },
   {
@@ -44,7 +44,7 @@ const PRODUCTS = [
     brand: "PetCare",
     description: "М'який та комфортний лежак для котів. Ідеальне місце для відпочинку вашого улюбленця.",
     rating: 4.7,
-    image: "/placeholder.svg?height=500&width=500",
+    image: "/CatBed.png",
     reviews: 156,
   },
   {
@@ -55,7 +55,7 @@ const PRODUCTS = [
     brand: "Whiskas",
     description: "Збалансований сухий корм для дорослих котів. Містить усі необхідні вітаміни та мінерали.",
     rating: 4.4,
-    image: "/placeholder.svg?height=500&width=500",
+    image: "/Whiskas.png",
     reviews: 92,
   },
   {
@@ -66,7 +66,7 @@ const PRODUCTS = [
     brand: "PetPlay",
     description: "Міцний гумовий м'ячик для активних ігор. Ідеальний для тренувань та розваг.",
     rating: 4.6,
-    image: "/placeholder.svg?height=500&width=500",
+    image: "/DogToy.png",
     reviews: 73,
   },
   {
@@ -77,7 +77,7 @@ const PRODUCTS = [
     brand: "Whiskas",
     description: "Високоякісний комкуючий наповнювач для котячого туалету. Відмінно поглинає запахи.",
     rating: 4.5,
-    image: "/placeholder.svg?height=500&width=500",
+    image: "/CatLitter.png",
     reviews: 118,
   },
   {
@@ -88,7 +88,7 @@ const PRODUCTS = [
     brand: "Royal Canin",
     description: "Міцний нейлоновий повідець для собак. Зручний та надійний у використанні.",
     rating: 4.8,
-    image: "/placeholder.svg?height=500&width=500",
+    image: "/DogLeash.png",
     reviews: 167,
   },
   {
@@ -99,50 +99,35 @@ const PRODUCTS = [
     brand: "PetCare",
     description: "Комплекс вітамінів для підтримки здоров'я та імунітету собак.",
     rating: 4.4,
-    image: "/placeholder.svg?height=500&width=500",
+    image: "/DogVitamins.png",
     reviews: 89,
   }
 ]
 
-const USERS = [
-  {
-    firstName: "Олександр",
-    lastName: "Петренко",
-    email: "user@example.com",
-    password: "password123", // В реальном проекте нужно использовать хеширование
-    phone: "+380501234567",
-    address: "вул. Хрещатик, 1, кв. 10",
-    city: "Київ",
-    zipCode: "01001",
-  }
-]
-
 async function main() {
-  console.log(`Начало заполнения базы данных...`)
+  console.log(`Начало очистки базы данных...`);
+
+  // Удаляем данные в правильном порядке
+  await prisma.orderItem.deleteMany({});
+  await prisma.order.deleteMany({});
+  await prisma.product.deleteMany({});
+  await prisma.user.deleteMany({});
+
+  console.log(`База данных очищена`);
+  console.log(`Начало заполнения базы данных...`);
 
   // Создаем товары
   for (const product of PRODUCTS) {
     await prisma.product.upsert({
-      where: { id: product.name }, // Используем имя как уникальный идентификатор (для демо)
+      where: { id: product.name },
       update: {},
       create: product,
     }).catch(e => {
-      console.error(`Ошибка при создании товара ${product.name}:`, e)
-    })
+      console.error(`Ошибка при создании товара ${product.name}:`, e);
+    });
   }
 
-  // Создаем пользователей
-  for (const user of USERS) {
-    await prisma.user.upsert({
-      where: { email: user.email },
-      update: {},
-      create: user,
-    }).catch(e => {
-      console.error(`Ошибка при создании пользователя ${user.email}:`, e)
-    })
-  }
-
-  console.log(`База данных заполнена.`)
+  console.log(`База данных заполнена.`);
 }
 
 main()
